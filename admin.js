@@ -1,0 +1,8 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import "./firebase-config.js";
+const config = window.HOLIDAY_PET_HELPERS_FIREBASE_CONFIG || {};
+const configReady = config.apiKey && config.projectId;
+const emailInput=document.getElementById("adminEmail"), passwordInput=document.getElementById("adminPassword"), signInButton=document.getElementById("unlockButton"), signOutButton=document.getElementById("signOutButton"), message=document.getElementById("adminMessage"), stateBox=document.getElementById("adminState");
+const setMessage=t=>message.textContent=t; const render=u=>{stateBox.textContent=u?`Signed in as ${u.email}`:"Not signed in"; signOutButton.style.display=u?"inline-flex":"none"};
+if(!configReady){setMessage("Firebase is not configured yet. Open firebase-config.js and paste your Firebase web app config.");}else{const app=initializeApp(config), auth=getAuth(app); emailInput.value=window.HOLIDAY_PET_HELPERS_ADMIN_EMAIL||""; onAuthStateChanged(auth,u=>{render(u); if(u) setMessage("Admin access is active. Go back to the home page to manage bookings and blocked dates.")}); signInButton.addEventListener("click", async()=>{try{await signInWithEmailAndPassword(auth,emailInput.value.trim(),passwordInput.value); setMessage("Signed in successfully. Go back to the home page.")}catch(err){setMessage(err.message)}}); signOutButton.addEventListener("click", async()=>{await signOut(auth); setMessage("Signed out."); render(null)})}
